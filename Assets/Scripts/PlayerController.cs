@@ -30,15 +30,10 @@ public class PlayerController : MonoBehaviour
 			
 		magneticClick.magUpdate(Input.acceleration, Input.compass.rawVector);
 
-		if(playerIsMoving)
-		{
-			moveVertical = magnetSpeed * 0.5f;
-		}
 
 		if (magneticClick.clicked ()) 
 		{
-			Debug.Log(Time.time + ": Click detected!");
-			playerIsMoving = !playerIsMoving;
+			moveVertical = magnetSpeed * 0.5f;
 		}
 			
 		Debug.Log (Time.time + ": magnetMagn=" + magneticClick.magnetMagn + ",magnetMagnBaseLine=" + magneticClick.magnetBaseLine);
