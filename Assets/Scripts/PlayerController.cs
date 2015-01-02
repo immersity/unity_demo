@@ -4,11 +4,19 @@ using System.Collections;
 public class PlayerController : MonoBehaviour 
 {
 	
-	public float speed;
+	public float forwardSpeed;
+	public float sidewaySpeed;
+
+
 	public GameObject camera;
 		
-	public float magnetSpeed;
+	public float inputSpeed;
+
 	public float getReadyTime;
+
+	public bool magnetEnabled;
+	public bool touchEnabled;
+
 	
 	private MagneticClick magneticClick;
 
@@ -28,28 +36,55 @@ public class PlayerController : MonoBehaviour
 	void FixedUpdate(){
 
 				
-		float moveVertical = Input.GetAxis("Vertical");
-			
-		magneticClick.magUpdate(Input.acceleration, Input.compass.rawVector);
+		float verticalInput = Input.GetAxis("Vertical");
+		float horizontalInput = Input.GetAxis ("Horizontal");
 
-		if (playerIsMoving) 
-		{
-			moveVertical = magnetSpeed * 0.5f;		
+
+		if (magnetEnabled) {
+		
+			magneticClick.magUpdate(Input.acceleration, Input.compass.rawVector);
+
+			if (magneticClick.clicked ()) 
+			{
+				if(Time.time < getReadyTime){
+					playerIsMoving = false;
+				}
+				else {
+					playerIsMoving = !playerIsMoving;
+				}
+
+			}
 		}
 
-		if (magneticClick.clicked ()) 
-		{
-			if(Time.time < getReadyTime){
-				playerIsMoving = false;
+
+		if (touchEnabled) {
+			if (Input.touchCount > 0 && (Input.GetTouch(0).phase == TouchPhase.Began || Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetTouch(0).phase == TouchPhase.Stationary)) {
+				playerIsMoving = true;
 			}
 			else {
-				playerIsMoving = !playerIsMoving;
+				playerIsMoving = false;
 			}
 
 		}
 
-		Vector3 movement = new Vector3( moveVertical * Sin(camera.transform.rotation.eulerAngles.y), 0.0f, moveVertical * Cos(camera.transform.rotation.eulerAngles.y));
-		transform.Translate (movement * speed * Time.deltaTime * Cos (camera.transform.rotation.eulerAngles.x));
+		if (playerIsMoving && (touchEnabled || magnetEnabled)) 
+		{
+			verticalInput = inputSpeed * 0.5f;		
+		}
+
+		Vector3 forwardMovement = new Vector3 (verticalInput * Sin (camera.transform.rotation.eulerAngles.y),
+		                                0.0f, 
+		                               verticalInput * Cos (camera.transform.rotation.eulerAngles.y));
+
+
+		Vector3 sidewayMovement = new Vector3 (horizontalInput * Cos (camera.transform.rotation.eulerAngles.y),
+		                                          0.0f, 
+		                                          -1 * horizontalInput * Sin (camera.transform.rotation.eulerAngles.y));
+
+		Vector3 forwardTranslation = forwardMovement * forwardSpeed * Time.deltaTime * Cos (camera.transform.rotation.eulerAngles.x);
+		Vector3 horizontalTranslation = sidewayMovement * sidewaySpeed * Time.deltaTime ;
+
+		transform.Translate (forwardTranslation + horizontalTranslation);
 		
 	}
 	

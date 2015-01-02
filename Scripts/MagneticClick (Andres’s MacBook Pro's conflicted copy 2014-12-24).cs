@@ -1,9 +1,4 @@
-﻿//
-//  Google Cardboard click code in C# for Unity.
-//  Author: Andrew Whyte
-//
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -27,11 +22,9 @@ public class MagneticClick {
 	private int N_SlowFIR = 25;
 	private int N_FastFIR_magnet = 3;
 	private int N_FastFIR_tilted = 5;  // Clicking the magnet tends to tilt the device slightly.
-
-	public float tiltThreshold = 0.3f;
-
-
-	bool pressedDown = false;
+	
+	
+	public float threshold = 1.0f;
 	
 	bool click = false;
 	bool clickReported = false;
@@ -63,7 +56,7 @@ public class MagneticClick {
 		tiltedBaseLine = ( (N_SlowFIR-1) * tiltedBaseLine + motionVec3.magnitude) / N_SlowFIR;
 		magnetBaseLine = ( (N_SlowFIR-1) * magnetBaseLine + compass.magnitude) / N_SlowFIR;
 		
-		if( tiltedMagn < tiltThreshold && (magnetMagn / magnetBaseLine) > 1.1  ) {
+		if( tiltedMagn < 0.2 && (magnetMagn / magnetBaseLine) > 1.1  ) {
 			if( clickReported == false) {
 				click = true;
 			}
@@ -71,10 +64,6 @@ public class MagneticClick {
 		} else  {
 			clickReported = false;
 		}
-
-
-
-
 	}
 	
 	public bool clicked()  {
@@ -89,6 +78,4 @@ public class MagneticClick {
 			return false;
 		}
 	}
-	
-
 }
